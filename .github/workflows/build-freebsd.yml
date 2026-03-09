@@ -12,25 +12,23 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@v4
 
-      # ================= 新增：编译前端 =================
       - name: 配置 Node.js 环境
         uses: actions/setup-node@v4
         with:
-          node-version: '18' # 推荐使用 Node 18 或 20
+          node-version: '18'
 
-      - name: 编译前端页面 (生成 web/dist)
+      - name: 编译前端页面
         env:
-          CI: false # 防止前端代码有 warning 时被视为 error 导致中断
+          CI: false 
         run: |
-          cd web        # 进入前端目录
-          npm install   # 安装前端依赖
-          npm run build # 打包前端页面
-      # =================================================
+          cd web        
+          npm install --legacy-peer-deps
+          npm run build 
 
       - name: 配置 Go 环境
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version: '1.21' 
 
       - name: 下载后端依赖
         run: go mod download
