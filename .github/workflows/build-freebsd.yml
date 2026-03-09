@@ -1,0 +1,37 @@
+name: Build for FreeBSD
+
+# 触发条件：允许在 Actions 页面手动点击运行
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build FreeBSD Binary
+    runs-on: ubuntu-latest # 使用 Ubuntu 环境来编译
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 配置 Go 环境
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21' # 请根据原项目的 go.mod 文件修改版本号，1.21 或 1.22 通常没问题
+
+      - name: 下载依赖
+        run: go mod download
+
+      - name: 交叉编译 FreeBSD/amd64 版本
+        env:
+          GOOS: freebsd
+          GOARCH: amd64
+          CGO_ENABLED: 0 # 【极度关键】关闭CGO，生成纯静态链接文件，防止在Serv00上报缺少依赖库的错
+        run: |
+          # 这里的 new-api 替换成你想要的最终文件名
+          go build -ldflags "-s -w" -o new-api-freebsd-amd64 .
+          
+      - name: 上传编译好的文件
+        uses: actions/upload-artifact@v4
+        with:
+          name: new-api-freebsd # 下载时的压缩包名字
+          path: new-api-freebsd-amd64 # 上一步编译出来的文件名
