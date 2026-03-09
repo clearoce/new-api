@@ -12,23 +12,24 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@v4
 
-      - name: 配置 Node.js 环境
-        uses: actions/setup-node@v4
+      # 替换后的前端构建逻辑
+      - name: 配置 Node.js 和 Bun 环境
+        uses: oven-sh/setup-bun@v1
         with:
-          node-version: '18'
+          bun-version: latest
 
       - name: 编译前端页面
         env:
           CI: false 
         run: |
           cd web        
-          npm install --legacy-peer-deps
-          npm run build 
+          bun install
+          bun run build 
 
       - name: 配置 Go 环境
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21' 
+          go-version: '1.22' # 建议升级到 1.22，对新特性支持更好
 
       - name: 下载后端依赖
         run: go mod download
